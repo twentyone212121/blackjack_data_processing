@@ -36,7 +36,7 @@ class BlackjackGame:
 
         return total_value
 
-    def display_card(self, hand):
+    def display_card(self, hand, add_back_side = False):
         if len(hand) == 0:
             return ""
 
@@ -50,6 +50,17 @@ class BlackjackGame:
                 "│       │",
                 "└───────┘"
         ]
+        back_side = [
+            "┌───────┐",
+            "│░░░░░░░│",
+            "│░░░░░░░│",
+            "│░░░░░░░│",
+            "│░░░░░░░│",
+            "└───────┘"
+        ]
+        if add_back_side:
+            card_strings.append(back_side[1])
+            last_card = back_side[2:]
 
         result = []
         for i, card in enumerate(card_strings):
@@ -89,8 +100,7 @@ class BlackjackGame:
         if reveal_dealer_card:
             print(self.display_card(self.dealer_hand))
         else:
-            print(self.display_card([self.dealer_hand[0]]))
-            print("Hidden Card")
+            print(self.display_card([self.dealer_hand[0]], add_back_side=True))
 
     def play(self):
         # Initial deal
@@ -98,10 +108,12 @@ class BlackjackGame:
         self.dealer_hand = [self.deal_card(), self.deal_card()]
 
         self.player_value = self.calculate_hand_value(self.player_hand)
-        self.dealer_value = self.calculate_hand_value(self.dealer_hand)
+        self.dealer_value = self.calculate_hand_value([self.dealer_hand[0]])
+
+        blackjack = self.player_value == 21
 
         # Player's turn
-        while True:
+        while self.player_value < 21:
             self.display_game_state()
             player_choice = input("Do you want to hit(h) or stand(s)? ").lower()
 
@@ -117,6 +129,7 @@ class BlackjackGame:
                 print("Invalid choice. Please enter 'hit' or 'stand'.")
 
         # Dealer's turn
+        self.dealer_value = self.calculate_hand_value(self.dealer_hand)
         if self.player_value <= 21:
             while self.dealer_value < 17:
                 self.dealer_hand.append(self.deal_card())
@@ -125,11 +138,13 @@ class BlackjackGame:
         # Display final results
         self.display_game_state(reveal_dealer_card=True)
 
+        if blackjack and self.dealer_value != 21:
+            print("Blackjack! You win x3/2")
+            return
+
         if self.dealer_value > 21 or \
-            (self.player_value <= 20 and self.player_value > self.dealer_value):
+            (self.player_value <= 21 and self.player_value > self.dealer_value):
             print("Congratulations! You win!")
-        elif self.player_value == 21 and self.dealer_value != 21:
-            print("Congratulations! You win x 3/2!")
         elif self.player_value == self.dealer_value:
             print("Nobody wins.")
         else:
