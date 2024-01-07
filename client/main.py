@@ -10,7 +10,7 @@ class BlackjackGame:
 
     def create_deck(self):
         suits = ['♥', '♦', '♣', '♠']
-        ranks = {"2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 10, "Q": 10, "K": 10, "A": 0}
+        ranks = {" 2": 2, " 3": 3, " 4": 4, " 5": 5, " 6": 6, " 7": 7, " 8": 8, " 9": 9, "10": 10, " J": 10, " Q": 10, " K": 10, " A": 0}
         deck = [{'rank': rank, 'suit': suit} for suit in suits for rank in ranks.items()]
         random.shuffle(deck)
         return deck
@@ -40,56 +40,39 @@ class BlackjackGame:
         if len(hand) == 0:
             return ""
 
-        card_top = "┌───────┐"
-        card_strings = [
-                f"│ {card['rank'][0]:<2}{card['suit']}   │" for card in hand
-        ]
-        last_card = [
-                "│       │",
-                "│       │",
-                "│       │",
-                "└───────┘"
-        ]
+        second_row = [f"│{card['rank'][0]}     │" 
+                        for card in hand]
+        third_row = [f"│ {card['suit']}     │" 
+                        for card in hand]
+        fourth_row = [f"│     {card['suit']} │" 
+                        for card in hand]
+        fifth_row = [f"│    {card['rank'][0]:2} │" 
+                        for card in hand]
         back_side = [
             "┌───────┐",
             "│░░░░░░░│",
             "│░░░░░░░│",
             "│░░░░░░░│",
             "│░░░░░░░│",
+            "│░░░░░░░│",
             "└───────┘"
         ]
+
+        size = len(hand)
+        result = [
+                "┌───────┐" * size, 
+                "".join(second_row),
+                "".join(third_row),
+                "│       │" * size,
+                "".join(fourth_row),
+                "".join(fifth_row),
+                "└───────┘" * size
+        ]
+
         if add_back_side:
-            card_strings.append(back_side[1])
-            last_card = back_side[2:]
+            for i in range(len(back_side)):
+                result[i] = result[i] + back_side[i]
 
-        result = []
-        for i, card in enumerate(card_strings):
-            margin1 = ''.join(['│' if i - j < 3 else ' ' for j in range(i)])
-            margin2 = ''.join([('└' if i - j == 2 else '│') 
-                               if i - j < 3 else ' ' for j in range(i)])
-            result.append(margin1 + card_top)
-            result.append(margin2 + card)
-
-        i = len(card_strings) - 1
-        margin1 = ''.join([
-            '│' if i + 1 - j < 3 else ' ' for j in range(i)
-        ])
-        margin2 = ''.join([
-            ('└' if i + 1 - j == 2 else '│') 
-            if i + 1 - j < 3 else ' ' for j in range(i)
-        ])
-        margin3 = ''.join([
-            '│' if i + 2 - j < 3 else ' ' for j in range(i)
-        ])
-        margin4 = ''.join([
-            ('└' if i + 2 - j == 2 else '│') 
-            if i + 2 - j < 3 else ' ' for j in range(i)
-        ])
-
-        result.append(margin1 + last_card[0])
-        result.append(margin2 + last_card[1])
-        result.append(margin3 + last_card[2])
-        result.append(margin4 + last_card[3])
         return '\n'.join(result)
 
     def display_game_state(self, reveal_dealer_card=False):
