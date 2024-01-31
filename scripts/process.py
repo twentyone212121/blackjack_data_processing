@@ -70,7 +70,7 @@ def card_prob(df: pd.DataFrame, savepath: str):
     plt.clf()
 
 def win_amount(df: pd.DataFrame, savepath: str):
-    win_amounts = ((df['playerwin'] * 2 - 1) * (df['blackjack'] * 0.5 + 1)) * 100
+    win_amounts = ((df['playerwin'] * 2 - 1) * (df['blackjack'] * df['playerwin'] * 0.5 + 1)) * 100
     average_win_amount = win_amounts.mean()
     plt.figure(figsize=(5, 6))
 
